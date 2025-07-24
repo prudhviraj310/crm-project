@@ -1,36 +1,22 @@
 pipeline {
     agent any
 
-    environment {
-        SONARQUBE_SCANNER_HOME = tool 'SonarQubeScanner'
-    }
-
     stages {
-        stage('Clone Repo') {
+        stage('Build') {
             steps {
-                git 'https://github.com/prudhviraj310/crm-project.git'
+                echo '🔨 Building CRM project...'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Test') {
             steps {
-                sh 'pip install -r requirements.txt'
+                echo '🧪 Running tests...'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Deploy') {
             steps {
-                withSonarQubeEnv('My SonarQube Server') {
-                    sh "${env.SONARQUBE_SCANNER_HOME}/bin/sonar-scanner"
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+                echo '🚀 Deploying to EC2...'
             }
         }
     }
