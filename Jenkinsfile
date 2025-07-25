@@ -1,40 +1,38 @@
 pipeline {
     agent any
-
     environment {
-        SONAR_TOKEN = credentials('sonar-token') // Add this as Secret Text in Jenkins Credentials
+        SONAR_TOKEN = credentials('sonar-token')
     }
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo '🔨 Building CRM project...'
-                // You can add actual build steps here (e.g., pip install)
+                git 'https://github.com/prudhviraj310/crm-project.git'
             }
         }
 
-        stage('Test') {
+        stage('Install Dependencies') {
             steps {
-                echo '🧪 Running tests...'
-                // You can add pytest or unit tests later
+                sh 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Tests & Generate Coverage') {
+            steps {
+                sh 'pytest --cov=app --cov-report=xml'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                dir('backend') {
-                    echo '🔍 Running SonarQube analysis...'
+                withSonarQubeEnv('SonarQube') {
                     sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=fastapi-backend \
-                        -Dsonar.projectName="FastAPI Backend" \
-                        -Dsonar.projectVersion=1.0 \
-                        -Dsonar.sources=app \
-                        -Dsonar.language=python \
-                        -Dsonar.sourceEncoding=UTF-8 \
-                        -Dsonar.exclusions=**/__pycache__/**,**/venv/** \
-                        -Dsonar.host.url=http://13.218.166.232:9000 \
-                        -Dsonar.login=$SONAR_TOKEN
+                    sonar-scanner \
+                      -Dsonar.projectKey=fastapi-backend \
+                      -Dsonar.sources=app \
+                      -Dsonar.python.coverage.reportPaths=coverage.xml \
+                      -Dsonar.host.url=http://13.218.166.232:9000 \
+                      -Dsonar.login=$SONAR_TOKEN
                     '''
                 }
             }
@@ -42,8 +40,8 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo '🚀 Deploying to EC2...'
-                // Add your SSH or deploy script here
+                echo 'Deploying application...'
+                // your deployment step here
             }
         }
     }

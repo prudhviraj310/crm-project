@@ -3,3 +3,5 @@ uvicorn[standard]
 python-dotenv
 python-jose
 passlib[bcrypt]
+pytest
+pytest-cov
