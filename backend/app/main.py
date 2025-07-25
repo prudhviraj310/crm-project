@@ -1,3 +1,6 @@
+def check_unused_variable():
+    unused_value = 123  # ❌ This variable is assigned but never used
+    return "Testing Sonar"
 from fastapi import FastAPI
 from app.routes import user_routes  # ✅ Importing user routes
 
